@@ -46,7 +46,7 @@ def heuristic(state, player, depth):
     else:
         score = -1
 
-    return score * (depth + 1)
+    return score * (depth + 2)
 
 
 def wins(state, player):
