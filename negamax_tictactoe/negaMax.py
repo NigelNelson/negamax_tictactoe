@@ -40,13 +40,13 @@ def evaluate(state):
     return score
 
 
-def heuristic(state, player, depth):
+def estimate_value(state, player, depth):
     if wins(state, player):
         score = +1
     else:
         score = -1
 
-    return score * (depth + 2)
+    return score * (depth + 1)
 
 
 def wins(state, player):
@@ -136,41 +136,33 @@ def minimax(state, depth, player):
     :param player: an human or a computer
     :return: a list with [the best row, best col, best score]
     """
-
-
-    # if player == COMP:
-    best = [-1, -1, -infinity]
-    # else:
-    #     best = [-1, -1, +infinity]
+    if player == COMP:
+        best = [-1, -1, -infinity]
+    else:
+        best = [-1, -1, +infinity]
 
     if depth == 0 or game_over(state):
-        score = heuristic(state, player, depth) * -1
+        score = evaluate(state)
         return [-1, -1, score]
 
     for cell in empty_cells(state):
-        # Setting x & y to open cell
         x, y = cell[0], cell[1]
-        # Setting possible cell to players value in game board
         state[x][y] = player
-        # Getting Score of this move
         score = minimax(state, depth - 1, -player)
-        # Returning the possible cell to 0
         state[x][y] = 0
-        # Setting x and y values of the score
         score[0], score[1] = x, y
 
-        # if player == COMP:
-        if score[2] > best[2]:
-            best = score  # max value
-        # else:
-        #     if score[2] < best[2]:
-        #         best = score  # min value
+        if player == COMP:
+            if score[2] > best[2]:
+                best = score  # max value
+        else:
+            if score[2] < best[2]:
+                best = score  # min value
 
-    best[2] *= -1
     return best
 
 
-def negaMax(state, depth):
+def negaMax(state, depth, player):
     """
     AI function that choice the best move
     :param state: current state of the board
@@ -182,20 +174,19 @@ def negaMax(state, depth):
     best = [-1, -1, -infinity]
 
     if depth == 0 or game_over(state):
-        score = evaluate(state)
-        return [-1, -1, score]
+        score = estimate_value(state, player, depth) * -1 # Invert value
+        return [-1, -1, -score]
 
     for cell in empty_cells(state):
         x, y = cell[0], cell[1]
-        score = negaMax(state, depth - 1)
-
+        state[x][y] = player
+        score = negaMax(state, depth - 1, -player)
         state[x][y] = 0
-        print(state)
         score[0], score[1] = x, y
+        if score[2] > best[2]:
+            best = score
 
-        if score[2] < best[2]:
-            best = score  # min value
-
+    best[2] *= -1 # Invert Value
     return best
 
 def clean():
@@ -250,7 +241,7 @@ def ai_turn(c_choice, h_choice):
         x = choice([0, 1, 2])
         y = choice([0, 1, 2])
     else:
-        move = minimax(board, depth, COMP)
+        move = negaMax(board, depth, COMP)
         x, y = move[0], move[1]
 
     set_move(x, y, COMP)
