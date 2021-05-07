@@ -2,7 +2,6 @@ from math import inf as infinity
 from random import choice
 import platform
 import time
-import numpy as np
 from os import system
 
 """
@@ -21,7 +20,6 @@ board = [
     [0, 0, 0],
     [0, 0, 0],
 ]
-# board = np.zeros((3,3))
 
 
 def evaluate(state):
@@ -41,6 +39,14 @@ def evaluate(state):
 
 
 def estimate_value(state, player, depth):
+    """
+    Function that is used as a heuristic for negamax algorithm
+    :param state: the state of the current board
+    :param player: the current player
+    :param depth: number of moves left to a complete game
+    :return: positive value if player won, negative if player doesn't win,
+    which is then scaled according to the depth of the game.
+    """
     if wins(state, player):
         score = +1
     else:
