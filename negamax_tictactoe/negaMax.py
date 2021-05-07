@@ -162,9 +162,9 @@ def minimax(state, depth, player):
     return best
 
 
-def negaMax(state, depth, player):
+def negamax(state, depth, player):
     """
-    AI function that choice the best move
+    Negamax algorithm used to make the best next choice for a player.
     :param state: current state of the board
     :param depth: node index in the tree (0 <= depth <= 9),
     but never nine in this case (see iaturn() function)
@@ -174,19 +174,19 @@ def negaMax(state, depth, player):
     best = [-1, -1, -infinity]
 
     if depth == 0 or game_over(state):
-        score = estimate_value(state, player, depth) * -1 # Invert value
+        score = estimate_value(state, player, depth)
         return [-1, -1, -score]
 
     for cell in empty_cells(state):
         x, y = cell[0], cell[1]
         state[x][y] = player
-        score = negaMax(state, depth - 1, -player)
+        score = negamax(state, depth - 1, -player)
         state[x][y] = 0
         score[0], score[1] = x, y
         if score[2] > best[2]:
             best = score
 
-    best[2] *= -1 # Invert Value
+    best[2] *= -1
     return best
 
 def clean():
@@ -241,7 +241,7 @@ def ai_turn(c_choice, h_choice):
         x = choice([0, 1, 2])
         y = choice([0, 1, 2])
     else:
-        move = negaMax(board, depth, COMP)
+        move = negamax(board, depth, COMP)
         x, y = move[0], move[1]
 
     set_move(x, y, COMP)
